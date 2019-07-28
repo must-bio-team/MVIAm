@@ -25,14 +25,14 @@ We demonstrate the performance of the proposed MVSPL in simulation and real micr
 
 Four methods are compared with the MVSPL method: Sparse logistic regression with the Lasso penalty (L_1) [1], Sparse logistic regression with the Elastic Net penalty (L\_EN) [2], Self-Paced Learning (SPL) [3], and Ensemble-based Elastic Net (Ensemble\_EN) [4].
 
-When MVIAm generates single-view data, it degenerates into traditional ``early stage'' data integration, and data analysis can be performed by L\_1, L\_EN and SPL. Ensemble\_EN and MVSPL construct a prediction model on each view of data before combing the model predictions and obtains the final prediction result based on Equation (1).
+When MVIAm generates single-view data, it degenerates into traditional ``early stage'' data integration, and data analysis can be performed by L\_1, L\_EN and SPL. Ensemble\_EN and MVSPL construct a prediction model on each view of data before combing the model predictions and obtains the final prediction result based on Equation (1).  
 $$
 y_k=\mathop{argmin}_{\substack{y_k}}\sum_{j=1}^{m}{L_k\left(y_k,f^{(j)}\left(x_k^{(j)},\beta^{(j)}\right)\right)}         (1)
 $$
 
 ### iii. The MVSPL model:
 
-The objective function of MVSPL can be expressed as:
+The objective function of MVSPL can be expressed as:  
 $$
 \mathop{\min}_{\substack{\beta^{\left(j\right)},v^{\left(j\right)}\in\left[0,1\right]^n,\\j=1,2,\ldots,m}}E(\beta^{\left(j\right)},v^{\left(j\right)};\lambda^{(j)},\gamma^{\left(j\right)},\delta)=\sum_{j=1}^{m}\sum_{i=1}^{n}{v_i^{(j)}L\left(y_i,f^{\left(j\right)}\left(x_i^{\left(j\right)},\beta^{\left(j\right)}\right)\right)}+\sum_{j=1}^{m}{\lambda^{(j)}||\beta^{\left(j\right)}||_{1}} \\
 -\sum_{j=1}^{m}\sum_{i=1}^{n}{\gamma^{\left(j\right)}v_i^{(j)}}-\delta\sum_{\substack{1\le k,j\le m,\\k\neq j}}{\left(v^{\left(k\right)}\right)^Tv^{\left(j\right)}}
@@ -82,16 +82,16 @@ $ Rscript Simu_MVSPL.R             ## Using multi-view self-paced learning to tr
 
 #### (I) Create table of study metadata, with a row for each study. See Lung_main_study_metadata.csv for an example. At a minimum, the following  columns must exist: study, studyDataType, and platformInfo.
 
-• study: Name of the study, which must be unique.
-• studyDataType: Indicates how the expression data is stored. There are currently five options for studyDataType: affy_geo, affy_custom, affy_series_matrix, series_matrix, and eset_rds.
-• platformInfo: Microarray platform, used for mapping probes to genes. 
+• study: Name of the study, which must be unique.  
+• studyDataType: Indicates how the expression data is stored. There are currently five options for studyDataType: affy_geo, affy_custom, affy_series_matrix, series_matrix, and eset_rds.  
+• platformInfo: Microarray platform, used for mapping probes to genes.  
 
 #### (II) For each study, download the expression data. The form of the expression data will depend on the studyDataType.
 
-• All the expression data should go in the same folder.
-• If studyDataType is affy_geo or affy_custom, the expression data should be a folder containing cel or cel.gz files. The name of the folder should match the name of the study.
-• If studyDataType is affy_series_matrix or series_matrix, the expression data should be a file ending in "_series_matrix.txt". The part of the file name prior to "_series_matrix.txt" should match the name of the study.
-• If studyDataType is eset_rds, the expression data should be an RDS file containing a Bioconductor ExpressionSet. The part of the file name prior to ".rds" should match the name of the study.
+• All the expression data should go in the same folder.  
+• If studyDataType is affy_geo or affy_custom, the expression data should be a folder containing cel or cel.gz files. The name of the folder should match the name of the study.  
+• If studyDataType is affy_series_matrix or series_matrix, the expression data should be a file ending in "_series_matrix.txt". The part of the file name prior to "_series_matrix.txt" should match the name of the study.  
+• If studyDataType is eset_rds, the expression data should be an RDS file containing a Bioconductor ExpressionSet. The part of the file name prior to ".rds" should match the name of the study.  
 
 Create fold named "data" in the current path, and download the dataset from GEO database. such as affy_series_matrix and affy_geo.
 
@@ -103,34 +103,31 @@ $ Rscript meta_function_Install.R
 
 **For each study with studyDataType of affy_geo or affy_custom, download the corresponding custom CDF package.**
 
-• Go to http://brainarray.mbni.med.umich.edu/Brainarray/Database/CustomCDF/CDF_download.asp.
-• Click on the link for the latest version of "ENTREZG".
-• Download the appropriate R source package(s), which should end in "cdf_nn.0.0.tar.gz", where nn refers to the version number.
-• Install the custom CDF packages.
-• Open R and set the working directory to the folder containing the 
-downloaded custom CDF packages. Execute the following command for each 
-custom CDF.
-• > install.packages('file name of custom CDF', repos=NULL, type='source')
-• Make sure that the part of the file name prior to "nn.0.0.tar.gz" matches the information in the platformInfo column.
+• Go to http://brainarray.mbni.med.umich.edu/Brainarray/Database/CustomCDF/CDF_download.asp.  
+• Click on the link for the latest version of "ENTREZG".  
+• Download the appropriate R source package(s), which should end in "cdf_nn.0.0.tar.gz", where nn refers to the version number.  
+• Install the custom CDF packages.  
+• Open R and set the working directory to the folder containing the downloaded custom CDF packages. Execute the following command for each custom CDF.  
+• > install.packages('file name of custom CDF', repos=NULL, type='source')  
+• Make sure that the part of the file name prior to "nn.0.0.tar.gz" matches the information in the platformInfo column.  
 
 **For each study with studyDataType of affy_series_matrix, download the corresponding custom CDF zip file.**
 
-• Go to http://brainarray.mbni.med.umich.edu/Brainarray/Database/CustomCDF/CDF_download.asp.
-• Click on the link for the latest version of "ENTREZG".
-• Download the appropriate zip file(s) (under column "CDF Seq, Map, Desc").
-• Unzip each zip file.
-• Move the file that ends in "_mapping.txt" to the folder that contains the downloaded expression data.
-• Make sure that the part of the file name that occurs prior to 
-"_mapping.txt" matches the information in the platformInfo column.
+• Go to http://brainarray.mbni.med.umich.edu/Brainarray/Database/CustomCDF/CDF_download.asp.  
+• Click on the link for the latest version of "ENTREZG".  
+• Download the appropriate zip file(s) (under column "CDF Seq, Map, Desc").  
+• Unzip each zip file.  
+• Move the file that ends in "_mapping.txt" to the folder that contains the downloaded expression data.  
+• Make sure that the part of the file name that occurs prior to "_mapping.txt" matches the information in the platformInfo column.  
 
 #### (IV) Create table of sample metadata, with a row for each sample. See Lung_sample_metadata.csv for an example.
 
-• At a minimum, the following columns must exist: study, sample, and a column for outcome or class.
-• The values in the study column should match the values in the study column in the table of study metadata.
-• For studies with a studyDataType of affy_geo or affy_custom, the sample names should be the names of the cel or cel.gz files (excluding the file extension).
-• For studies with a studyDataType of affy_series_matrix or series_matrix, the sample names should be the GSM identifiers.
-• For studies with a studyDataType of eset_rds, the samples names should be the colnames of the corresponding ExpressionSet.
-• The name of each sample must be unique across all the samples.
+• At a minimum, the following columns must exist: study, sample, and a column for outcome or class.  
+• The values in the study column should match the values in the study column in the table of study metadata.  
+• For studies with a studyDataType of affy_geo or affy_custom, the sample names should be the names of the cel or cel.gz files (excluding the file extension).  
+• For studies with a studyDataType of affy_series_matrix or series_matrix, the sample names should be the GSM identifiers.  
+• For studies with a studyDataType of eset_rds, the samples names should be the colnames of the corresponding ExpressionSet.  
+• The name of each sample must be unique across all the samples.  
 
 #### (V) Import all the functions for pre-processing all the datasets.
 
