@@ -25,7 +25,7 @@ We demonstrate the performance of the proposed MVSPL in simulation and real micr
 
 Four methods are compared with the MVSPL method: Sparse logistic regression with the Lasso penalty (L_1) [1], Sparse logistic regression with the Elastic Net penalty (L\_EN) [2], Self-Paced Learning (SPL) [3], and Ensemble-based Elastic Net (Ensemble\_EN) [4].
 
-When MVIAm generates single-view data, it degenerates into traditional ``early stage'' data integration, and data analysis can be performed by L\_1, L\_EN and SPL. Ensemble\_EN constructs a prediction model on each view of data before combing the model predictions and obtains the final prediction result based on Equation (1).
+When MVIAm generates single-view data, it degenerates into traditional ``early stage'' data integration, and data analysis can be performed by L\_1, L\_EN and SPL. Ensemble\_EN and MVSPL construct a prediction model on each view of data before combing the model predictions and obtains the final prediction result based on Equation (1).
 $$
 y_k=\mathop{argmin}_{\substack{y_k}}\sum_{j=1}^{m}{L_k\left(y_k,f^{(j)}\left(x_k^{(j)},\beta^{(j)}\right)\right)}         (1)
 $$
