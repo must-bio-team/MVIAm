@@ -1,5 +1,16 @@
-# This code is based on Self-Paced Learning using logistic regression model with penalty function (Lasso, Elastic net, et al.).
+##----------------------------------
+##  Code Version 1.0
+##  The real data experiment code for self-paced learning with L1 penalty.
+##  SPL
+##  Created by Zi-Yi Yang 
+##  Modified by Zi-Yi Yang on July 27, 2019
+##  Concact: yangziyi091100@163.com
+##----------------------------------
+## Setting path ##
+WhereAmI <- "/path"
+source(paste0(WhereAmI,"Function.R"))
 
+## Load packages
 library(Matrix)
 library(tseries)
 library(glmnet)
@@ -9,116 +20,55 @@ library(pROC)
 library(ROCR)
 library(ggplot2)
 
-selfpace1.rank <- function(dev_decval, dev_labels, lambda) {
-  #calculate the loss
-  loss = (dev_decval-dev_labels)^2	#squared error
-  #loss = 1/(1+e^(-1*loss))			#logistic
-  
-  selecedidx = which(loss <= lambda)
-  
-  #return the result
-  result = selecedidx
-  return(result)
-}
+##------------------------
+## Input X and Y
+##------------------------
+X <- readRDS(file = paste0(WhereAmI,"data/Breast_meta_view1.rds"))
+Gene <- X[,1]
+X <- data.matrix(t(X[,-1]))
 
-selfpaced.single <- function(splitid, lambda, uplambda, Iter_num) {
-  trainidx = which(splits[,splitid]==0)
-  testidx = which(splits[,splitid]==1)
-  
-  #the list storing the result for each iteration
-  valpredmatrix = list()
-  evlpredmatrix = list()
-  coefmatrix = list()
-  nonzerocoefmatrix = list()
-  iters.V_idx = list()
-  
-  #the starting values
-  cvfit<-cv.glmnet(X[trainidx,],Y[trainidx],
-                   alpha=1,
-                   family="binomial",
-                   type.measure = "class")
-  valpred <- predict(cvfit,X[trainidx,],type="response",s="lambda.min")
-  
-  v.idx = selfpace1.rank(valpred, dev_labels = Y[trainidx], lambda = lambda)
-  this.training.vidx = v.idx
-  
-  #validation set is the same as the training set
-  dev_labels = Y[trainidx]
-  val_labels = dev_labels
-  dev_x = X[trainidx,]
-  
-  #store starting values
-  initial.vidx = list()
-  initial.vidx[[1]] = this.training.vidx
-  iters.vidx = list()	
-  
-  for(iter in 1:Iter_num) {
-    iters.vidx[[iter]] = this.training.vidx
-    
-    # glmnet (Lasso, Elastic net & L2)
-    cvfit<-cv.glmnet(data.matrix(dev_x[this.training.vidx,]),
-                     dev_labels[this.training.vidx],
-                     alpha=1,
-                     family="binomial",
-                     type.measure = "class") 
-    
-    valprediction <- predict(cvfit,X[trainidx,],type="response",s="lambda.min")
-    coefprediction = as.vector(coef(cvfit,s="lambda.min"))
-    numbernonzerocoef = length(which(coefprediction!=0))
-    trprediction = valprediction
-    tsprediction <- predict(cvfit,X[testidx,],type="response",s="lambda.min")
-    
-    #self-paced learning
-    selectedidx = selfpace1.rank(trprediction, dev_labels, lambda)
-    this.training.vidx = selectedidx
-    
-    #change the parameter accoding to the step size
-    lambda = uplambda + lambda
+Y <- read.table(file = paste0(WhereAmI,"/data/Breast_meta_labels.txt"), header = TRUE, sep = "\t")
+Samp <- Y[,1]
+Y <- data.matrix(Y[,-1])
 
-    #store the prediction for this iteration
-    coefmatrix[[iter]]= coefprediction
-    nonzerocoefmatrix[[iter]] = numbernonzerocoef
-    valpredmatrix[[iter]] = as.numeric(valprediction)
-    evlpredmatrix[[iter]] = tsprediction
-    iters.V_idx[[iter]] = selectedidx
-  }
-  
-  results <- list("valpredmatrix" = valpredmatrix, 
-                  "evlpredmatrix" = evlpredmatrix, 
-                  "initialvals" = initial.vidx, 
-                  "itervidx" = iters.V_idx, 
-                  "Coef"=coefmatrix, 
-                  "NumbernonzeroCoef"=nonzerocoefmatrix)
-  return(results)
-}
+##-------------------------------------------------------
+## Random select samples and Setting training and test data
+##-------------------------------------------------------
+randidx <- sample(c(1:length(Y)),size = length(Y))
+splits <- vector(mode = "numeric", length = length(Y))
+splits_trainidx <- randidx[1:(0.7*length(randidx))]
+splits_testidx <- randidx[(0.7*length(randidx)+1):length(randidx)]
+splits[splits_trainidx] <- 0
+splits[splits_testidx] <- 1
+splits <- as.matrix(splits)
 
-####### Input X and Y  ########
-# breast cancer
-X = read.table('/data/Data_meta_profile.txt',header = TRUE, sep = "\t")
-Gene = X[,1]
-X = data.matrix(t(X[,-1]))
- 
-Y = read.table('/data/Data_gene.txt',header = TRUE, sep = "\t")
-Samp = Y[,1]
-Y = data.matrix(Y[,-1])
+trainidx <- which(splits[,1]==0)
+testidx <- which(splits[,1]==1)
 
-
-# random select samples and Setting training and testing
-randidx = sample(c(1:length(Y)),size=length(Y))
-splits = vector(mode = "numeric", length = length(Y))
-splits_trainidx = randidx[1:(0.7*length(randidx))]
-splits_testidx = randidx[(0.7*length(randidx)+1):length(randidx)]
-splits[splits_trainidx] = 0
-splits[splits_testidx] = 1
-splits = as.matrix(splits)
-
-trainidx = which(splits[,1]==0)
-testidx = which(splits[,1]==1)
-
+##------------------------------------------------------
+## Training the classifier
+##------------------------------------------------------
 # tuning the parameters
-lambda = 0.05
-uplambda = 0.05
-Iter_num = 100
+lambda <- 4          # age parameter
+uplambda <- 2
+Iter_num <- 100
 
-results = selfpaced.single(1, lambda = lambda, uplambda = uplambd, Iter_num = Iter_num)
+results <- selfpaced.single(splitid = 1, 
+                           lambda = lambda, 
+                           uplambda = uplambda, 
+                           Iter_num = Iter_num)
 
+## According to the training loss value to select best results
+best.iter <- which(results$valmaps == min(results$valmaps[1:length(results$itervidx)]))
+best_valperf <- results$valpredmatrix[[best.iter]]
+best_evlperf <- results$evlpredmatrix[[best.iter]]
+best_coef <- results$Coef[[best.iter]]
+coef.idx <- which(best_coef!=0)
+coef.gene <- as.character(Gene[coef.idx])
+coef.value <- best_coef[coef.idx]
+coef.info <- cbind(coef.gene,coef.value)
+
+## Record best result
+results.best <- list("valpredmatrix" = best_valperf, 
+                     "evlpredmatrix" = best_evlperf,
+                     "Coef.info" =coef.info)
