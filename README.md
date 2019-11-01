@@ -12,6 +12,18 @@ Communication: [yangziyi091100@163.com](mailto:yangziyi091100@163.com)
 
 The widespread applications in microarray technology have produced the vast quantity of publicly available gene expression datasets. However, analysis of gene expression data using biostatistics and machine learning approaches is a challenging task due to (1) high noise; (2) small sample size with high dimensionality; (3) batch effects and (4) low reproducibility of significant biomarkers. These issues reveal the complexity of gene expression data, thus significantly obstructing microarray technology in clinical applications. The integrative analysis offers an opportunity to address these issues and provides a more comprehensive understanding of the biological systems, but current methods have several limitations. This work leverages state of the art machine learning development for multiple gene expression datasets integration, classification and identification of significant biomarkers. We design a novel integrative framework, MVIAm - Multi-View based Integrative Analysis of microarray data for identifying biomarkers. It applies multiple cross-platform normalization methods to aggregate multiple datasets into a multi-view dataset and utilizes a robust learning mechanism Multi-View Self-Paced Learning (MVSPL) for gene selection in cancer classification problems. We demonstrate the capabilities of MVIAm using simulated data and studies of breast cancer and lung cancer, it can be applied flexibly and is an effective tool for facing the four challenges of gene expression data analysis. Our proposed model makes microarray integrative analysis more systematic and expands its range of applications.
 
+If you find this code useful in your research then please cite  
+```bash
+@article{yang2019multi,
+  title={Multi-view based integrative analysis of gene expression data for identifying biomarkers},
+  author={Yang, Zi-Yi and Liu, Xiao-Ying and Shu, Jun and Zhang, Hui and Ren, Yan-Qiong and Xu, Zong-Ben and Liang, Yong},
+  journal={Scientific reports},
+  volume={9},
+  year={2019},
+  publisher={Nature Publishing Group}
+}
+、、、
+
 ## II. Introduce about code
 
 ### i. The repository can be divided into two parts:
